@@ -27,14 +27,14 @@ export default function withCalendar(
   WrappedComponent: ComponentType<WrappedComponentProps & any>
 ) {
   return function(props: WrappedComponentProps) {
-    const _currentMonth: Date = new Date();
-    const _weeksInMonth: number = getWeeksInMonth(_currentMonth);
-    const _weekDays: Array<string> = WeekDays;
-
+    const _initialDate: Date = new Date();
     const [calendar, setCalendar] = useState({
-      day: _currentMonth,
-      month: _currentMonth
+      day: _initialDate,
+      month: _initialDate
     });
+
+    const _weeksInMonth: number = getWeeksInMonth(calendar.month);
+    const _weekDays: Array<string> = WeekDays;
 
     const addMonth = () => {
       const nextMonth = addMonths(calendar.month, 1);
