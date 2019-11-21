@@ -1,21 +1,19 @@
 // @flow
-import React, { useState } from "react";
+import React from "react";
 import type { Node } from "react";
-import { getDate } from "date-fns";
-import DatePickerHelper from "../../helpers/datepicker";
+import { getDate, format } from "date-fns";
+import withCalendar from "../withCalendar/withCalendar";
+import type { WrappedComponentProps } from "../withCalendar/withCalendar";
 import {
   WeekDayRow,
   WeekDaySlot,
-  MonthGridContainer
+  MonthGridContainer,
+  CalendarContainer
 } from "./MonthGrid.styles";
-
-const defaultProps = {
-  date: new Date()
-};
 
 type Props = {
   date: Date
-} & typeof defaultProps;
+} & WrappedComponentProps;
 
 /**
  *
@@ -23,32 +21,47 @@ type Props = {
  * @param  { Date } date Selected date in the component
  * @returns
  */
-const MonthGrid = ({ date }: Props) => {
-  const [day] = useState(date);
-  const { WeekDays } = DatePickerHelper;
+const MonthGrid = withCalendar(
+  ({
+    date = new Date(),
+    _weekDays,
+    getCalendarMonth,
+    addMonth,
+    subMonth,
+    isCurrentDay,
+    setDay,
+    calendar: { day, month }
+  }: Props) => {
+    const selectedMonth = getCalendarMonth(month);
 
-  const helper = new DatePickerHelper();
-
-  const selectedMonth = helper.getCalendarMonth(day);
-
-  return (
-    <MonthGridContainer>
-      <WeekDayRow>
-        {WeekDays.map((day: string) => (
-          <WeekDaySlot>{day.charAt(0)}</WeekDaySlot>
-        ))}
-      </WeekDayRow>
-      {selectedMonth.map((week: Array<Date>): Node => (
-        <WeekDayRow>
-          {week.map((day: Date) => (
-            <WeekDaySlot>{getDate(day)}</WeekDaySlot>
+    return (
+      <CalendarContainer>
+        <button onClick={subMonth}>{"<"}</button>
+        <MonthGridContainer>
+          {format(month, "MMMM")}
+          <WeekDayRow>
+            {_weekDays.map((day: string, index: number): Node => (
+              <WeekDaySlot key={index}>{day.charAt(0)}</WeekDaySlot>
+            ))}
+          </WeekDayRow>
+          {selectedMonth.map((week: Array<Date>, index: number): Node => (
+            <WeekDayRow key={index}>
+              {week.map((_day: Date, index: number): Node => (
+                <WeekDaySlot
+                  onClick={() => setDay(_day)}
+                  isSelected={isCurrentDay(_day)}
+                  key={index}
+                >
+                  {getDate(_day)}
+                </WeekDaySlot>
+              ))}
+            </WeekDayRow>
           ))}
-        </WeekDayRow>
-      ))}
-    </MonthGridContainer>
-  );
-};
-
-MonthGrid.defaultProps = defaultProps;
+        </MonthGridContainer>
+        <button onClick={addMonth}>{">"}</button>
+      </CalendarContainer>
+    );
+  }
+);
 
 export { MonthGrid, MonthGrid as default };
