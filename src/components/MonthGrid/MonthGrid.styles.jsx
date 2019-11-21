@@ -7,6 +7,7 @@ const WeekDayRow = styled.div`
 const WeekDaySlot = styled.div`
   border: 1px black solid;
   min-width: 2rem;
+  background-color: ${props => (props.isSelected ? "grey" : "inherit")};
 `;
 
 const MonthGridContainer = styled.div`
@@ -14,4 +15,8 @@ const MonthGridContainer = styled.div`
   flex-flow: column;
 `;
 
-export { WeekDayRow, WeekDaySlot, MonthGridContainer };
+const CalendarContainer = styled.div`
+  display: flex;
+`;
+
+export { WeekDayRow, WeekDaySlot, MonthGridContainer, CalendarContainer };
