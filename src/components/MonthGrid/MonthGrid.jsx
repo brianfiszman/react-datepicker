@@ -1,8 +1,8 @@
 // @flow
 import React from "react";
 import type { Node } from "react";
-import { getDate, format } from "date-fns";
-import withCalendar from "../withCalendar/withCalendar";
+import { getDate } from "date-fns";
+import withCalendar from "../withCalendar";
 import type { WrappedComponentProps } from "../withCalendar/withCalendar";
 import {
   WeekDayRow,
@@ -11,57 +11,53 @@ import {
   CalendarContainer
 } from "./MonthGrid.styles";
 
-type Props = {
-  date: Date
-} & WrappedComponentProps;
+type Props = WrappedComponentProps;
 
 /**
  *
  *
- * @param  { Date } date Selected date in the component
- * @returns
+ * @param  { Props } calendar withCalendar props
+ * @returns React.FunctionalComponent
  */
-const MonthGrid = withCalendar(
-  ({
-    date = new Date(),
-    _weekDays,
+const MonthGrid = withCalendar(({ calendar }: Props) => {
+  const {
     getCalendarMonth,
+    getCurrentMonthName,
     addMonth,
     subMonth,
-    isCurrentDay,
-    setDay,
-    calendar: { day, month }
-  }: Props) => {
-    const selectedMonth = getCalendarMonth(month);
+    isCurrentDate,
+    setDate
+  } = calendar;
 
-    return (
-      <CalendarContainer>
-        <button onClick={subMonth}>{"<"}</button>
-        <MonthGridContainer>
-          {format(month, "MMMM")}
-          <WeekDayRow>
-            {_weekDays.map((day: string, index: number): Node => (
-              <WeekDaySlot key={index}>{day.charAt(0)}</WeekDaySlot>
+  const selectedMonth = getCalendarMonth(calendar.currentDate);
+
+  return (
+    <CalendarContainer>
+      <button onClick={subMonth}>{"<"}</button>
+      <MonthGridContainer>
+        {getCurrentMonthName()}
+        <WeekDayRow>
+          {calendar.WeekDays.map((day: string, index: number): Node => (
+            <WeekDaySlot key={index}>{day.charAt(0)}</WeekDaySlot>
+          ))}
+        </WeekDayRow>
+        {selectedMonth.map((week: Array<Date>, index: number): Node => (
+          <WeekDayRow key={index}>
+            {week.map((_day: Date, index: number): Node => (
+              <WeekDaySlot
+                onClick={() => setDate(_day)}
+                isSelected={isCurrentDate(_day)}
+                key={index}
+              >
+                {getDate(_day)}
+              </WeekDaySlot>
             ))}
           </WeekDayRow>
-          {selectedMonth.map((week: Array<Date>, index: number): Node => (
-            <WeekDayRow key={index}>
-              {week.map((_day: Date, index: number): Node => (
-                <WeekDaySlot
-                  onClick={() => setDay(_day)}
-                  isSelected={isCurrentDay(_day)}
-                  key={index}
-                >
-                  {getDate(_day)}
-                </WeekDaySlot>
-              ))}
-            </WeekDayRow>
-          ))}
-        </MonthGridContainer>
-        <button onClick={addMonth}>{">"}</button>
-      </CalendarContainer>
-    );
-  }
-);
+        ))}
+      </MonthGridContainer>
+      <button onClick={addMonth}>{">"}</button>
+    </CalendarContainer>
+  );
+});
 
 export { MonthGrid, MonthGrid as default };
