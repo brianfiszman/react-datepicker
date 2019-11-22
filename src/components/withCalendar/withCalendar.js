@@ -9,55 +9,90 @@ import {
   addWeeks,
   addMonths,
   subMonths,
-  isSameDay
+  isSameDay,
+  format
 } from "date-fns";
 import { WeekDays } from "./withCalendar.constants";
 
 export type WrappedComponentProps = {
-  getCalendarMonth: Function,
-  addMonth: Function,
-  subMonth: Function,
-  isCurrentDay: Function,
-  setDay: Function,
-  calendar: { day: Date, month: Date },
-  _weekDays: Array<string>
+  calendar: {
+    getCalendarMonth: Function,
+    getCurrentMonthName: Function,
+    addMonth: Function,
+    subMonth: Function,
+    isCurrentDate: Function,
+    setDate: Function,
+    currentDate: Date,
+    WeekDays: Array<string>
+  }
 };
 
-export default function withCalendar(
+function withCalendar(
   WrappedComponent: ComponentType<WrappedComponentProps & any>
 ) {
   return function(props: WrappedComponentProps) {
     const _initialDate: Date = new Date();
-    const [calendar, setCalendar] = useState({
-      day: _initialDate,
-      month: _initialDate
-    });
+    const [currentDate, setCalendar] = useState(_initialDate);
 
-    const _weeksInMonth: number = getWeeksInMonth(calendar.month);
-    const _weekDays: Array<string> = WeekDays;
+    const _weeksInMonth: number = getWeeksInMonth(currentDate);
 
-    const addMonth = () => {
-      const nextMonth = addMonths(calendar.month, 1);
+    /**
+     * Advances the calendar a month
+     */
+    const addMonth: Function = (): void => {
+      const nextMonth: Date = addMonths(currentDate, 1);
 
-      setCalendar({ day: nextMonth, month: nextMonth });
+      setCalendar(nextMonth);
     };
 
-    const subMonth = () => {
-      const prevMonth = subMonths(calendar.month, 1);
+    /**
+     * Goes back the calendar a month
+     */
+    const subMonth: Function = (): void => {
+      const prevMonth: Date = subMonths(currentDate, 1);
 
-      setCalendar({ day: prevMonth, month: prevMonth });
+      setCalendar(prevMonth);
     };
 
-    const isCurrentDay = _day => isSameDay(_day, calendar.day);
+    /**
+     * Check if the date is in the same
+     * day that the calendar's current date
+     *
+     * @param {Date} date
+     * @returns {boolean}
+     */
+    const isCurrentDate: Function = (date: Date): boolean =>
+      isSameDay(date, currentDate);
 
-    const setDay = day => setCalendar({ day, month: day });
+    /**
+     * Set the calendar's date
+     *
+     * @param {Date} date
+     */
+    const setDate: Function = (date: Date): void => setCalendar(date);
 
-    const getCalendarMonth = (date: Date) => {
-      const _startOfMonth = startOfMonth(date);
-      const _firstWeek = startOfWeek(_startOfMonth);
-      const weeksInMonth = [...Array(_weeksInMonth)].map<Date[]>(
+    /**
+     * Get the current month name. i.e. December
+     *
+     * @returns {string}
+     */
+    const getCurrentMonthName: Function = (): string =>
+      format(currentDate, "MMMM");
+
+    /**
+     * Get the calendar's entire month with all the weeks
+     * within, including the previous and next months days
+     * that are included in those weeks
+     *
+     * @param {Date} date
+     * @returns {Array<Date[]>}
+     */
+    const getCalendarMonth: Function = (date: Date): Array<Date[]> => {
+      const _startOfMonth: Date = startOfMonth(date);
+      const _firstWeek: Date = startOfWeek(_startOfMonth);
+      const weeksInMonth: Array<Date[]> = [...Array(_weeksInMonth)].map<Date[]>(
         (_, weekIndex: number) =>
-          [...Array(_weekDays.length)].map((_, dayIndex: number) =>
+          [...Array(WeekDays.length)].map((_, dayIndex: number) =>
             addWeeks(addDays(_firstWeek, dayIndex), weekIndex)
           )
       );
@@ -67,17 +102,20 @@ export default function withCalendar(
 
     return (
       <WrappedComponent
-        {...{
+        calendar={{
           getCalendarMonth,
-          _weekDays,
+          getCurrentMonthName,
           addMonth,
           subMonth,
-          isCurrentDay,
-          calendar,
-          setDay,
-          ...props
+          isCurrentDate,
+          currentDate,
+          setDate,
+          WeekDays
         }}
+        {...props}
       />
     );
   };
 }
+
+export { withCalendar, withCalendar as default };
