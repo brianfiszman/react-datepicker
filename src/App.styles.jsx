@@ -1,12 +1,14 @@
-.App {
+import styled from "styled-components";
+
+const AppContainer = styled.div`
   text-align: center;
-}
+`;
 
-.App-logo {
+const Logo = styled.img`
   height: 40vmin;
-}
+`;
 
-.App-header {
+const Header = styled.header`
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -15,8 +17,6 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
-}
+`;
 
-.App-link {
-  color: #09d3ac;
-}
+export { AppContainer, Logo, Header };
