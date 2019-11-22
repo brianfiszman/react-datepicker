@@ -1,0 +1,33 @@
+{
+  "extends": [
+    "standard",
+    "react-app",
+    "plugin:flowtype/recommended",
+    "prettier/standard",
+    "plugin:prettier/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jest": true
+  },
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "react-hooks", "flowtype"],
+  "rules": {
+    "semi": [2, "always"],
+    "no-extra-semi": 2,
+    "strict": ["error", "global"],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  }
+}
