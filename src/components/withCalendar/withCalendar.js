@@ -16,12 +16,43 @@ import { WeekDays } from "./withCalendar.constants";
 
 export type WrappedComponentProps = {
   calendar: {
-    getCalendarMonth: Function,
-    getCurrentMonthName: Function,
-    addMonth: Function,
-    subMonth: Function,
-    isCurrentDate: Function,
-    setDate: Function,
+    /**
+     * Get the calendar's entire month with all the weeks
+     * within, including the previous and next months days
+     * that are included in those weeks
+     *
+     * @param {Date} date
+     * @returns {Array<Date[]>}
+     */
+    getCalendarMonth: (date: Date) => Array<Date[]>,
+    /**
+     * Get the current month name. i.e. December
+     *
+     * @returns {string}
+     */
+    getCurrentMonthName: () => string,
+    /**
+     * @description Advances the calendar a month
+     */
+    addMonth: () => void,
+    /**
+     * @description Goes back the calendar a month
+     */
+    subMonth: () => void,
+    /**
+     * Check if the date is in the same
+     * day that the calendar's current date
+     *
+     * @param {Date} date
+     * @returns {boolean}
+     */
+    isCurrentDate: (date: Date) => boolean,
+    /**
+     * Set the calendar's date
+     *
+     * @param {Date} date
+     */
+    setDate: (date: Date) => void,
     currentDate: Date,
     WeekDays: Array<string>
   }
@@ -36,58 +67,25 @@ function withCalendar(
 
     const _weeksInMonth: number = getWeeksInMonth(currentDate);
 
-    /**
-     * Advances the calendar a month
-     */
-    const addMonth: Function = (): void => {
+    const addMonth = (): void => {
       const nextMonth: Date = addMonths(currentDate, 1);
 
       setCalendar(nextMonth);
     };
 
-    /**
-     * Goes back the calendar a month
-     */
-    const subMonth: Function = (): void => {
+    const subMonth = (): void => {
       const prevMonth: Date = subMonths(currentDate, 1);
 
       setCalendar(prevMonth);
     };
 
-    /**
-     * Check if the date is in the same
-     * day that the calendar's current date
-     *
-     * @param {Date} date
-     * @returns {boolean}
-     */
-    const isCurrentDate: Function = (date: Date): boolean =>
-      isSameDay(date, currentDate);
+    const isCurrentDate = (date: Date): boolean => isSameDay(date, currentDate);
 
-    /**
-     * Set the calendar's date
-     *
-     * @param {Date} date
-     */
-    const setDate: Function = (date: Date): void => setCalendar(date);
+    const setDate = (date: Date): void => setCalendar(date);
 
-    /**
-     * Get the current month name. i.e. December
-     *
-     * @returns {string}
-     */
-    const getCurrentMonthName: Function = (): string =>
-      format(currentDate, "MMMM");
+    const getCurrentMonthName = (): string => format(currentDate, "MMMM");
 
-    /**
-     * Get the calendar's entire month with all the weeks
-     * within, including the previous and next months days
-     * that are included in those weeks
-     *
-     * @param {Date} date
-     * @returns {Array<Date[]>}
-     */
-    const getCalendarMonth: Function = (date: Date): Array<Date[]> => {
+    const getCalendarMonth = (date: Date): Array<Date[]> => {
       const _startOfMonth: Date = startOfMonth(date);
       const _firstWeek: Date = startOfWeek(_startOfMonth);
       const weeksInMonth: Array<Date[]> = [...Array(_weeksInMonth)].map<Date[]>(
